@@ -60,7 +60,7 @@ async function addAssignment(message: Message) {
       const date = await Tools.getDate(answer);
       if (date == null) {
         await message.reply(
-          "I'm unable to understand that date. Could you please specify it in month-date form? Like this: `!birthday december-24`. Thank you!"
+          "I'm unable to understand that date. Could you please specify it in month-date form? Like this: `december-24`. Thank you!"
         );
         return;
       }

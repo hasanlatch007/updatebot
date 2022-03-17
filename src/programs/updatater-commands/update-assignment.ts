@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
-import { Message } from "discord.js";
+import { CollectorFilter, Message, MessageReaction, User } from "discord.js";
 import prisma from "../../../prisma";
-import { MyData } from "../../common/tools";
+import Tools, { MyData } from "../../common/tools";
 
 const updateAssignment = async (message: Message) => {
-  //!updateAssignment CLASSNAME
+  //!updateHW CLASSNAME
   const words = message.content.split(" ").slice(1);
   const [...rest] = words;
   const className = rest.join(" ");
@@ -56,13 +56,62 @@ const updateAssignment = async (message: Message) => {
     dueDate: dataArray[indexOfData].dueDate,
     assignment: collectedNewAssignment,
   };
-  dataArray.splice(1, indexOfData);
 
-  //also very ugly but again oh well :KEKW: x2
-  await prisma.classes.update({
-    where: { id: maybeClass.id },
-    data: { assignments: dataArray as unknown as Prisma.JsonValue },
-  });
+  const maybeChangeDeadline = await message.channel.send(
+    "Would you like to update the deadline?"
+  );
+  await maybeChangeDeadline.react("✅");
+  await maybeChangeDeadline.react("❎");
+  const filter: CollectorFilter<[MessageReaction, User]> = (reaction, user) =>
+    (reaction.emoji.name === "❎" || reaction.emoji.name === "✅") && !user.bot;
+  const maybeChangeDate = (
+    await maybeChangeDeadline.awaitReactions({ filter, time: 60000, max: 1 })
+  ).first();
+
+  switch (maybeChangeDate.emoji.toString()) {
+    case "✅":
+      await message.channel.send(
+        "Okay you can send the date here format: MMM-DD (MMM as the name of the month)"
+      );
+
+      const answer = (
+        await message.channel.awaitMessages({
+          filter: (answerReply) =>
+            !answerReply.author.bot && answerReply.author == message.author,
+          time: 60000,
+          max: 1,
+        })
+      )
+        .first()
+        .toString();
+      if (answer.length < 2) {
+        await message.reply("I prefer if you use a name for the month!");
+        return;
+      }
+      const date = await Tools.getDate(answer);
+      if (date == null) {
+        await message.reply(
+          "I'm unable to understand that date. Could you please specify it in month-date form? Like this: `december-24`. Thank you!"
+        );
+        return;
+      }
+      dataArray[indexOfData] = {
+        dueDate: date.toString(),
+        assignment: collectedNewAssignment,
+      };
+  }
+
+  try {
+    //also very ugly but again oh well :KEKW: x2
+    await prisma.classes.update({
+      where: { id: maybeClass.id },
+      data: { assignments: dataArray as unknown as Prisma.JsonValue },
+    });
+    await message.reply(`Updated assignment to ${collectedNewAssignment}`);
+  } catch (e) {
+    await message.reply("Failed to updated assignment, contact Duck Friend");
+    console.log("Failed to update assignment", e);
+  }
 };
 
 export default updateAssignment;

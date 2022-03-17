@@ -4,7 +4,9 @@ import { MyData } from "../../common/tools";
 
 const viewHW = async (message: Message) => {
   //!viewHW CLASS
-  const className = message.content.split(" ")[1];
+  const words = message.content.split(" ").slice(1);
+  const [...rest] = words;
+  const className = rest.join(" ");
 
   if (!className) {
     await message.reply("Incorrect Syntax, Usage: `!viewHW CLASS`");
