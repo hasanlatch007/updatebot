@@ -26,13 +26,19 @@ const viewHW = async (message: Message) => {
   let dataToString = "";
   doesExist.assignments.forEach((entry: unknown | MyData) => {
     //very very ugly but meh it works :kekw:
+    const todaysDate = new Date();
+    todaysDate.setDate(todaysDate.getDate());
     const data = <MyData>entry;
     const date =
       data.dueDate === "Unknown date"
         ? data.dueDate
         : data.dueDate.split(" ")[1] + " " + data.dueDate.split(" ")[2];
+    const timeLeft =
+      date === "Unknown date"
+        ? "NA"
+        : Number(data.dueDate.split(" ")[2]) - todaysDate.getDate();
     dataToString = dataToString.concat(
-      `**${data.assignment}** \n Deadline: ${date} \n\n`
+      `**${data.assignment}** \n Deadline: ${date} \n Time Left: ${timeLeft} Days \n\n`
     );
   });
 

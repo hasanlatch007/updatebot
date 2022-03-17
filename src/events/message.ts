@@ -39,7 +39,7 @@ const handleServerMessages = async (message: Message) => {
       ? await deleteAssignment(message)
       : null;
   if (firstWord === "!viewHW") await viewHW(message);
-  if (firstWord === "!classes") await search(message)
+  if (firstWord === "!classes") await search(message);
 };
 
 export default routeMessage;

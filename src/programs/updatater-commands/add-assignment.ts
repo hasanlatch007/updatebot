@@ -10,7 +10,10 @@ import Tools, { months } from "../../common/tools";
 
 async function addAssignment(message: Message) {
   //!addHW className assignment
-  const [, className, assignment] = message.content.split(" ");
+  const words = message.content.split(" ").slice(1);
+  console.log(words);
+  const [className, ...rest] = words;
+  const assignment = rest.join(" ");
 
   if (!className || !assignment) {
     await message.reply(
