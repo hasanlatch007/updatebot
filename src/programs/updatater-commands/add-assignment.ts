@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import prisma from "../../../prisma";
 import Tools, { months } from "../../common/tools";
+import {Prisma} from "@prisma/client";
 
 async function addAssignment(message: Message) {
   //!addHW className assignment
@@ -92,13 +93,13 @@ async function addAssignment(message: Message) {
       await message.channel.send("Attempting to add assignment!");
       try {
         const data = {
+          dueDate: date,
           assignment: assignment,
-          dueDate: date.toString(),
         };
         const dataToAdd = [...maybeClass.assignments, data];
         await prisma.classes.update({
           where: { id: maybeClass.id },
-          data: { assignments: dataToAdd },
+          data: { assignments: dataToAdd as unknown as Prisma.JsonValue },
         });
         await message.reply("Added assignment!");
       } catch (e) {

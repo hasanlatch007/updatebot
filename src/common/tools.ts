@@ -1,7 +1,7 @@
-import { GuildMember, Message } from "discord.js";
+import { GuildMember } from "discord.js";
 
 export interface MyData {
-  dueDate: string;
+  dueDate: Date | string;
   assignment: string;
 }
 

@@ -1,6 +1,6 @@
 import Discord, { Message } from "discord.js";
 import prisma from "../../../prisma";
-import { MyData } from "../../common/tools";
+import { months, MyData } from "../../common/tools";
 
 const viewHW = async (message: Message) => {
   //!viewHW CLASS
@@ -32,11 +32,11 @@ const viewHW = async (message: Message) => {
     const date =
       data.dueDate === "Unknown date"
         ? data.dueDate
-        : data.dueDate.split(" ")[1] + " " + data.dueDate.split(" ")[2];
+        : months[new Date(data.dueDate).getMonth()] + " " + new Date(data.dueDate).getDate().toString();
     const timeLeft =
       date === "Unknown date"
         ? "NA"
-        : Number(data.dueDate.split(" ")[2]) - todaysDate.getDate();
+        : new Date(data.dueDate).getDate() - todaysDate.getDate();
     dataToString = dataToString.concat(
       `**${data.assignment}** \n Deadline: ${date} \n Time Left: ${timeLeft} Days \n\n`
     );
