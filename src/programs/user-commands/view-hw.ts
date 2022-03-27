@@ -1,6 +1,21 @@
+import { Prisma } from "@prisma/client";
 import Discord, { Message } from "discord.js";
 import prisma from "../../../prisma";
-import { months, MyData } from "../../common/tools";
+import Tools, { months, MyData } from "../../common/tools";
+
+const getDates = async (selectedClass: Prisma.JsonValue[]) => {
+  const unsortedDates: (Date | string) [] = []
+  const unknownDates: string[][] = []
+  selectedClass.forEach((entry: unknown | MyData) => {
+    const data = <MyData>entry
+    if (data.dueDate != "Unknown date") {
+      unsortedDates.push(data.dueDate)
+    } else {
+      unknownDates.push([data.assignment, data.dueDate])
+    }
+  })
+  return [unknownDates, unsortedDates.sort((a,b) => a > b ? 1 : -1)]
+}
 
 const viewHW = async (message: Message) => {
   //!viewHW CLASS
@@ -23,24 +38,24 @@ const viewHW = async (message: Message) => {
     await message.delete();
     return;
   }
+  //Implement here to order dates by order
+  const todaysDate = new Date();
+  let [unknownDates, sortedDates] = await getDates(doesExist.assignments)
   let dataToString = "";
-  doesExist.assignments.forEach((entry: unknown | MyData) => {
-    //very very ugly but meh it works :kekw:
-    const todaysDate = new Date();
-    todaysDate.setDate(todaysDate.getDate());
-    const data = <MyData>entry;
-    const date =
-      data.dueDate === "Unknown date"
-        ? data.dueDate
-        : months[new Date(data.dueDate).getMonth()] + " " + new Date(data.dueDate).getDate().toString();
-    const timeLeft =
-      date === "Unknown date"
-        ? "NA"
-        : new Date(data.dueDate).getDate() - todaysDate.getDate();
-    dataToString = dataToString.concat(
-      `**${data.assignment}** \n Deadline: ${date} \n Time Left: ${timeLeft} Days \n\n`
-    );
+  (sortedDates as Date[]).forEach(dateEntry => {
+    const foundDate = doesExist.assignments.find((entry: unknown | MyData) => {
+      const data = <MyData>entry
+      return data.dueDate === dateEntry
+    })
+    const convertedData = foundDate as unknown as MyData
+    const timeLeft = Tools.getTimeLeft(new Date(convertedData.dueDate))
+    dataToString = dataToString.concat(`**${convertedData.assignment}** \n Deadline: ${months[new Date(convertedData.dueDate).getMonth()]} ${new Date(convertedData.dueDate).getDate()} \n Time Left: ${timeLeft} Days \n\n`)
   });
+  
+
+  (unknownDates as string[][]).forEach(entry => {
+    dataToString = dataToString.concat(`**${entry[0]}** \n Deadline: Unkown Date \n Time Left: NA Days \n\n`)
+  })
 
   const embed = new Discord.MessageEmbed()
     .setColor("BLUE")

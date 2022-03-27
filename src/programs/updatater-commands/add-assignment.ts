@@ -12,7 +12,6 @@ import {Prisma} from "@prisma/client";
 async function addAssignment(message: Message) {
   //!addHW className assignment
   const words = message.content.split(" ").slice(1);
-  console.log(words);
   const [className, ...rest] = words;
   const assignment = rest.join(" ");
 

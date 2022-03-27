@@ -95,6 +95,17 @@ class Tools {
 
     return new Date(1972, month, day);
   }
+
+  static getTimeLeft = (dueDate: Date) => {
+    const todaysDate = new Date()
+    if (dueDate.getMonth() > todaysDate.getMonth()) {
+      const lastDayOfTheMonth = new Date(todaysDate.getFullYear(), todaysDate.getMonth()+1, 0).getDate();
+      return lastDayOfTheMonth - todaysDate.getDate() + dueDate.getDate() 
+    } else {
+      return dueDate.getDate() - todaysDate.getDate()
+    }
+  }
 }
+
 
 export default Tools;
