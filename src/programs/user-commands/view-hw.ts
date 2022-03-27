@@ -14,7 +14,7 @@ const getDates = async (selectedClass: Prisma.JsonValue[]) => {
       unknownDates.push([data.assignment, data.dueDate])
     }
   })
-  return [unknownDates, unsortedDates.sort((a,b) => a > b ? 1 : -1)]
+  return [unknownDates, unsortedDates.sort()]
 }
 
 const viewHW = async (message: Message) => {
