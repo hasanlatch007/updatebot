@@ -108,7 +108,11 @@ const updateAssignment = async (message: Message) => {
       data: { assignments: dataArray as unknown as Prisma.JsonValue },
     });
     await message.reply(`Updated assignment to ${collectedNewAssignment}`);
-    const updateChannel = await message.guild.channels.cache.find(channel => channel.name === "")
+    await Tools.pingUsersOnUpdateOrAddOrDelete(
+      className,
+      collectedNewAssignment,
+      "updated"
+    );
   } catch (e) {
     await message.reply("Failed to updated assignment, contact Duck Friend");
     console.log("Failed to update assignment", e);

@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import prisma from "../../../prisma";
 import Tools, { months } from "../../common/tools";
-import {Prisma} from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 async function addAssignment(message: Message) {
   //!addHW className assignment
@@ -101,6 +101,11 @@ async function addAssignment(message: Message) {
           data: { assignments: dataToAdd as unknown as Prisma.JsonValue },
         });
         await message.reply("Added assignment!");
+        await Tools.pingUsersOnUpdateOrAddOrDelete(
+          className,
+          assignment,
+          "added"
+        );
       } catch (e) {
         await message.reply("Failed to save Data, contact Duck Friend");
         console.log("Failed to add assignment", e);
@@ -121,6 +126,11 @@ async function addAssignment(message: Message) {
           data: { assignments: dataToAdd },
         });
         await message.reply("Added assignment!");
+        await Tools.pingUsersOnUpdateOrAddOrDelete(
+          className,
+          assignment,
+          "added"
+        );
       } catch (e) {
         await message.reply("Failed to save Data, contact Duck Friend");
         console.log("Failed to add assignment", e);

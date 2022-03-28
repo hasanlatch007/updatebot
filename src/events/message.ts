@@ -5,6 +5,7 @@ import createClass from "../programs/updatater-commands/create-class";
 import deleteAssignment from "../programs/updatater-commands/delete-assignment";
 import deleteClass from "../programs/updatater-commands/delete-class";
 import updateAssignment from "../programs/updatater-commands/update-assignment";
+import sendHelpMessage from "../programs/user-commands/help";
 import search from "../programs/user-commands/search-classes";
 import viewHW from "../programs/user-commands/view-hw";
 
@@ -40,6 +41,7 @@ const handleServerMessages = async (message: Message) => {
       : null;
   if (firstWord === "!viewHW") await viewHW(message);
   if (firstWord === "!classes") await search(message);
+  if (firstWord === "!help") await sendHelpMessage(message);
 };
 
 export default routeMessage;

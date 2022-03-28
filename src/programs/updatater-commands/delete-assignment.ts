@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { Message } from "discord.js";
 import prisma from "../../../prisma";
-import { MyData } from "../../common/tools";
+import Tools, { MyData } from "../../common/tools";
 
 const deleteAssignment = async (message: Message) => {
   //!deleteHW CLASSNAME
@@ -10,9 +10,7 @@ const deleteAssignment = async (message: Message) => {
   const className = rest.join(" ");
 
   if (!className) {
-    await message.reply(
-      "Incorrect Syntax, Usage: `!updateAssignment CLASS_NAME"
-    );
+    await message.reply("Incorrect Syntax, Usage: `!deleteHW CLASS_NAME");
     await message.delete();
     return;
   }
@@ -49,6 +47,11 @@ const deleteAssignment = async (message: Message) => {
       data: { assignments: dataArray as unknown as Prisma.JsonValue },
     });
     await message.reply("Assignment deleted!");
+    await Tools.pingUsersOnUpdateOrAddOrDelete(
+      className,
+      collectedOldAssignment,
+      "deleted"
+    );
   } catch (e) {
     await message.reply("Failed to delete assignment, contact Duck friend");
     console.log("Failed to delete assignment", e);

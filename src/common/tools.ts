@@ -1,4 +1,5 @@
-import { GuildMember } from "discord.js";
+import Discord, { GuildMember, Message, TextChannel } from "discord.js";
+import bot from "..";
 
 export interface MyData {
   dueDate: Date | string;
@@ -6,18 +7,18 @@ export interface MyData {
 }
 
 export const months = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
+  "january",
+  "february",
+  "march",
+  "april",
   "may",
-  "jun",
-  "jul",
-  "aug",
-  "sep",
-  "oct",
-  "nov",
-  "dec",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ];
 
 class Tools {
@@ -97,15 +98,65 @@ class Tools {
   }
 
   static getTimeLeft = (dueDate: Date) => {
-    const todaysDate = new Date()
+    const todaysDate = new Date();
     if (dueDate.getMonth() > todaysDate.getMonth()) {
-      const lastDayOfTheMonth = new Date(todaysDate.getFullYear(), todaysDate.getMonth()+1, 0).getDate();
-      return lastDayOfTheMonth - todaysDate.getDate() + dueDate.getDate() 
+      const lastDayOfTheMonth = new Date(
+        todaysDate.getFullYear(),
+        todaysDate.getMonth() + 1,
+        0
+      ).getDate();
+      return lastDayOfTheMonth - todaysDate.getDate() + dueDate.getDate();
     } else {
-      return dueDate.getDate() - todaysDate.getDate()
+      return dueDate.getDate() - todaysDate.getDate();
     }
-  }
-}
+  };
 
+  static pingUsersOnUpdateOrAddOrDelete = async (
+    className: string,
+    project: string,
+    addOrUpdateOrDelete: string
+  ) => {
+    const guild = await bot.guilds.fetch(process.env.GUILD_ID);
+    const channel = guild.channels.cache.find(
+      (channel) => channel.name === "update-des-cours-bloc1"
+    ) as TextChannel;
+    const pingRole = guild.roles.cache.find((role) => role.name === "TEMP");
+    const embed = new Discord.MessageEmbed();
+    switch (addOrUpdateOrDelete) {
+      case "added":
+        embed
+          .setColor("BLUE")
+          .setTitle(`Added project to ${className}`)
+          .setDescription(`New project: ${project}`)
+          .setFooter({
+            text: `Use !viewHW ${className} to added project and deadline`,
+          });
+        await channel.send(`<@&${pingRole.id}>`);
+        await channel.send({ embeds: [embed] });
+        break;
+
+      case "deleted":
+        embed
+          .setColor("BLUE")
+          .setTitle(`Removed project for ${className}`)
+          .setDescription(`Removed project: ${project}`);
+        await channel.send(`<@&${pingRole.id}>`);
+        await channel.send({ embeds: [embed] });
+        break;
+
+      case "updated":
+        embed
+          .setColor("BLUE")
+          .setTitle(`Updated project deadline in ${className}`)
+          .setDescription(`Updated project: ${project}`)
+          .setFooter({
+            text: `Use !viewHW ${className} to see updated project and deadline`,
+          });
+        await channel.send(`<@&${pingRole.id}>`);
+        await channel.send({ embeds: [embed] });
+        break;
+    }
+  };
+}
 
 export default Tools;
