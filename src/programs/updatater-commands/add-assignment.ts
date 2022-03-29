@@ -61,6 +61,7 @@ async function addAssignment(message: Message) {
         return;
       }
       const date = await Tools.getDate(answer);
+      date.setHours(9);
       if (date == null) {
         await message.reply(
           "I'm unable to understand that date. Could you please specify it in month-date form? Like this: `december-24`. Thank you!"
